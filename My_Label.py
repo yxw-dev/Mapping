@@ -13,6 +13,7 @@ class MyLabel(QLabel):
     flag = False
     sendmsg = pyqtSignal(QPixmap)
     regions = list()
+    imgs = list()
 
     def mousePressEvent(self, ev:QMouseEvent):
         if ev.button() == Qt.LeftButton:
@@ -27,6 +28,7 @@ class MyLabel(QLabel):
             self.y1 = 0
             self.y2 = 0
             self.regions.clear()
+            self.imgs.clear()
             self.update()
 
     def mouseReleaseEvent(self, event:QMouseEvent):
@@ -34,6 +36,7 @@ class MyLabel(QLabel):
         res = self.pixmap().copy(QRect(self.x1 ,self.y1 , abs(self.x2 - self.x1), abs(self.y2 - self.y1)))
         this_region = [self.x1 ,self.y1 , abs(self.x2 - self.x1), abs(self.y2 - self.y1)]
         self.regions.append(this_region)
+        self.imgs.append(res)
         self.sendmsg.emit(res)
 
     def mouseMoveEvent(self, ev:QMouseEvent):
