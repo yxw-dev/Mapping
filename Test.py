@@ -18,16 +18,21 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.frush_Chart(self.dict_c , 0)
         self.frush_Chart(self.dict_r , 1)
-        print(self.tableWidget.rowCount())
 
     def Frush_ui(self, region):
         # self.update()
         if self.sender() == self.label_1:
-            print(1)
+            img = self.label_1.imgs[0]
+            print("检验单图片")
         else:
-            print(2)
+            for i in self.labs:
+                if self.sender() == i:
+                    img = i.imgs[0]
+                    print("报告图片")
+        print(img)
 
-
+        #写表格
+        self.Insert_Chart("11" , 9,1)
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MyMainWindow()

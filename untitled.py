@@ -152,7 +152,6 @@ class Ui_MainWindow(object):
             temp_pic = QPixmap(i).scaled(919, 1380)
             lab1.setPixmap(temp_pic)
             self.labs.append(lab1)
-            print(i)
             self.labs[-1].sendmsg.connect(self.Frush_ui)
             num = num + 1
         print(self.labs)
@@ -203,7 +202,8 @@ class Ui_MainWindow(object):
     def Insert_Chart(self , value , row , col):
         if col > 4:
             return
-        if row > self.tableWidget.rowCount():
+        if row > (self.tableWidget.rowCount()-1):
             self.tableWidget.setRowCount(row + 1)
         item1 = QTableWidgetItem(str(value))
-        self.tableWidget.setItem(row, col, item1)
+        print(str(value))
+        self.tableWidget.setItem(int(row), int(col), item1)

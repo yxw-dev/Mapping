@@ -12,8 +12,11 @@ class MyLabel(QLabel):
     _height = 0
     flag = False
     sendmsg = pyqtSignal(QPixmap)
-    regions = list()
-    imgs = list()
+
+    def __init__(self, Parent=None):
+        super(QLabel, self).__init__(Parent)
+        self.regions = list()
+        self.imgs = list()
 
     def mousePressEvent(self, ev:QMouseEvent):
         if ev.button() == Qt.LeftButton:
