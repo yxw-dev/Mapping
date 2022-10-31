@@ -10,6 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView, QWidget, QFileDialog
 import My_Label
+import Ini_operate
 import os
 
 
@@ -31,8 +32,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget_4)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.pushButton = QtWidgets.QPushButton(self.widget_4)
+        self.pushButton_ini = QtWidgets.QPushButton(self.widget_4)
         self.pushButton.setObjectName("pushButton")
+        self.pushButton_ini.setObjectName("pushButton_ini")
         self.horizontalLayout_3.addWidget(self.pushButton)
+        self.horizontalLayout_3.addWidget(self.pushButton_ini)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem)
         self.verticalLayout.addWidget(self.widget_4)
@@ -120,19 +124,21 @@ class Ui_MainWindow(object):
         self.report_result = dict()
 
         #表格插入表头
-        self.tableWidget.setRowCount(9)
+        self.tableWidget.setRowCount(0)
         self.tableWidget.setColumnCount(4)
-        self.tableWidget.setHorizontalHeaderLabels(["检验标准", "检验结果","报告数据","核对结果"])
+        self.tableWidget.setHorizontalHeaderLabels(["检验标准" ,"报告数据","检验结果","核对结果"])
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         #绑定信号槽
         self.pushButton.clicked.connect(self.Get_Report_path)
+        self.pushButton_ini.clicked.connect(self.save_ini)
         self.pushButton_2.clicked.connect(self.Get_Check_Report_path)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.pushButton.setText(_translate("MainWindow", "导入报告"))
+        self.pushButton_ini.setText(_translate("MainWindow", "保存位置信息"))
         self.pushButton_2.setText(_translate("MainWindow", "导入校验报告单"))
         self.label.setText(_translate("MainWindow", "核对结果："))
         #self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
@@ -150,6 +156,7 @@ class Ui_MainWindow(object):
             lab1.resize(919, 1380)
             self.tabWidget.addTab(tab, str(num))
             temp_pic = QPixmap(i).scaled(919, 1380)
+            lab1.set_path(i)
             lab1.setPixmap(temp_pic)
             self.labs.append(lab1)
             self.labs[-1].sendmsg.connect(self.Frush_ui)
@@ -177,8 +184,17 @@ class Ui_MainWindow(object):
 
         tem_pic = QPixmap(self.check_report).scaled(919, 1380)
         self.label_1.setPixmap(tem_pic)
+        self.label_1.set_path(self.check_report)
         self.label_1.sendmsg.connect(self.Frush_ui)
 
+    def save_ini(self):
+        region_info = Ini_operate.ini_operate()
+        c , r , img_1 , img2 = region_info.get_region()
+        print(c)
+        print(r)
+        print(img_1)
+        print(img2)
+        # region_info.save_region(self.label_1.regions , self.labs[0].regions , [self.label_1.width() , self.label_1.height()] , [self.labs[0].width() , self.labs[0].height()])
     #type为0,添加字典数据至第一第二列，为1添加字典数据至第三第四列
     def frush_Chart(self , dat:dict , type:int):
         num = len(dat)
@@ -197,13 +213,41 @@ class Ui_MainWindow(object):
                 self.tableWidget.setItem(i , 2 , item3)
                 #判断程序
                 item4 = QTableWidgetItem("合格")
-                self.tableWidget.setItem(i, 3, item4)
+                self.tableWidget.setItem(i, 4, item4)
 
     def Insert_Chart(self , value , row , col):
-        if col > 4:
+        if col > 5:
             return
         if row > (self.tableWidget.rowCount()-1):
             self.tableWidget.setRowCount(row + 1)
         item1 = QTableWidgetItem(str(value))
-        print(str(value))
         self.tableWidget.setItem(int(row), int(col), item1)
+
+    def Frush_table(self , c:dict , r:dict):
+        self.tableWidget.setRowCount(c.keys().__len__())
+        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setHorizontalHeaderLabels(["检测名目", "检验结果", "报告数据",  "核对结果"])
+        index = 0
+        for i in c.keys():
+            item1 = QTableWidgetItem(str(i))
+            item2 = QTableWidgetItem(str(c[i]))
+            self.tableWidget.setItem(index, int(0), item1)
+            self.tableWidget.setItem(index, int(1), item2)
+            index = index + 1
+        try:
+            for i in range(0 , len(r)):
+                item1 = QTableWidgetItem(list(r.values())[i])
+                print(list(r.keys())[i])
+                if list(r.keys())[i] in list(c.keys()):
+                    ind = list(c.keys()).index(list(r.keys())[i] )
+                    if list(c.values())[ind] == list(r.values())[i]:
+                        str1 = "√"
+                    else:
+                        str1 = "×"
+                    item2 = QTableWidgetItem(str1)
+                    self.tableWidget.setItem(ind, int(2), item1)
+                    self.tableWidget.setItem(ind, int(3), item2)
+        except:
+            My_Label.QMessageBox.show("error")
+
+
